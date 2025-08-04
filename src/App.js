@@ -7,6 +7,7 @@ import { supabase } from './supabase'
 import Chat from './components/Chat'
 import Navbar from './components/Navbar'
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
+import { SpeedInsights } from "@vercel/speed-insights/react"
 
 const App = () => {
   const [user, setUser] = useState(null)
@@ -36,6 +37,7 @@ const App = () => {
         {user && <Chat user={user} />}
 
       </section>
+      <SpeedInsights />
     </div>
     </SessionContextProvider>
   )
