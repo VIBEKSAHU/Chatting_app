@@ -1,25 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
 
-function App() {
+
+
+import React, { useEffect, useState } from 'react'
+import { supabase } from './supabase'
+// import SignIn from './components/SignIn'
+import Chat from './components/Chat'
+import Navbar from './components/Navbar'
+import { SessionContextProvider } from '@supabase/auth-helpers-react';
+
+const App = () => {
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    // Check session on mount
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user)
+    })
+
+    // Listen for login/logout
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null)
+      }
+    )
+
+    return () => listener?.subscription.unsubscribe()
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <SessionContextProvider supabaseClient={supabase}>
+    <div className="max-w-[728px] mx-auto text-center mt-10">
+      <section className="flex flex-col h-[90vh] bg-gray-100 shadow-xl border relative">
+        <Navbar user={user} />
+        {/* {user ? <Chat user={user} /> : <SignIn />} */}
+        {user && <Chat user={user} />}
+
+      </section>
     </div>
-  );
+    </SessionContextProvider>
+  )
 }
 
-export default App;
+export default App
+
